@@ -1,12 +1,12 @@
 import { useSDK } from "@metamask/sdk-react";
 import { useEffect, useState } from "react";
 import Web3 from "web3";
-import mintTokenAbi from "./mintTokenAbi.json";
+import TokenCard from "./components/TokenCard";
+import contractAddress from "./contractAddress.json";
 
 const App = () => {
   const [account, setAccount] = useState("");
   const [web3, setWeb3] = useState();
-  const [contract, setContract] = useState();
 
   const { sdk, provider } = useSDK();
   const onClickMetaMask = async () => {
@@ -24,27 +24,39 @@ const App = () => {
     setWeb3(new Web3(provider));
   }, [provider]);
 
-  useEffect(() => {
-    if (!web3) return;
-
-    setContract(
-      new web3.eth.Contract(
-        mintTokenAbi,
-        "0x46242FE77bb02CEcE8AFAaef8E119A14CC90DF83"
-      )
-    );
-  }, [web3]);
-  useEffect(() => console.log(contract), [contract]);
-
   return (
-    <div className="bg-red-100 min-h-screen flex justify-center items-center">
+    <div className="bg-blue-100 min-h-screen flex justify-center items-center">
+      <img src="./img/whale.jpg" className="absolute z-10 " />
       {account ? (
-        <div>
-          {account.substring(0, 5)}...{account.substring(account.length - 5)}
-          <button onClick={() => setAccount("")}>LogOut</button>
+        <div className="z-30 text-sm mx-5 border flex flex-col justify-center items-center">
+          <img src="./img/sepolia.png" className=" w-500px h-96 mb-40" />
+          <div>
+            {account.substring(0, 5)}...{account.substring(account.length - 5)}
+            <button className="absolute" onClick={() => setAccount("")}>
+              LogOut
+            </button>
+          </div>
+          <div className="">
+            
+            {contractAddress.map((v, i) => (
+              <TokenCard
+                key={i}
+                account={account}
+                web3={web3}
+                address={v.address}
+                owner={v.owner}
+                walletAccount={v.walletAccount}
+              />
+            ))}
+          </div>
         </div>
       ) : (
-        <button onClick={onClickMetaMask}>Metamask Login</button>
+        <button
+          className="z-20 bg-blue-500 rounded-3xl px-5 border shadow-2xl"
+          onClick={onClickMetaMask}
+        >
+          Metamask Login
+        </button>
       )}
     </div>
   );
